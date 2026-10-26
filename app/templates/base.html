@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{% block title %}Ella Store — Game Top-Up{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="{{ url_for('pages.index') }}">
+      <span class="brand-mark">E</span> Ella Store
+    </a>
+    <nav class="site-nav">
+      <a href="{{ url_for('pages.index') }}">Games</a>
+      <a href="{{ url_for('pages.lookup') }}">Track order</a>
+      <a href="{{ url_for('admin.login') }}">Staff</a>
+    </nav>
+  </header>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      <div class="flash-stack">
+        {% for category, message in messages %}
+          <div class="flash flash-{{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  {% endwith %}
+
+  <main class="site-main">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div>
+      <strong>Ella Store</strong>
+      <p>Instant game top-ups in Cambodia. Pay with any Bakong-supported banking app.</p>
+    </div>
+    <form class="newsletter" method="post" action="{{ url_for('pages.subscribe') }}">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label for="newsletter-email">Get restock and promo news</label>
+      <div class="inline">
+        <input id="newsletter-email" type="email" name="email" placeholder="you@example.com" required>
+        <button class="btn btn-ghost" type="submit">Subscribe</button>
+      </div>
+    </form>
+  </footer>
+
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Order {{ order.order_no }} — Ella Store{% endblock %}
+
+{% block content %}
+<section class="order" data-order="{{ order.order_no }}" data-status="{{ order.status }}"
+         data-expires="{{ order.expires_at }}">
+
+  <header class="order-head">
+    <div>
+      <span class="pill">Order {{ order.order_no }}</span>
+      <h1>{{ order.item_title }}</h1>
+      <p>{{ game.short_name or game.name }} · for {{ order.player_name or order.player_id }}</p>
+    </div>
+    <span class="status status-{{ order.status }}" id="order-status">
+      {{ order.status.replace('_', ' ')|title }}
+    </span>
+  </header>
+
+  <div class="order-grid">
+    <div class="panel">
+      {% if order.status == 'pending_payment' %}
+        <h2>Scan to pay</h2>
+        {% if qr %}
+          <div class="qr-frame">{{ qr|safe }}</div>
+        {% endif %}
+        <p class="amount">{{ order.total_cents|usd }}</p>
+        <p class="hint">
+          Open any Bakong-supported banking app and scan. The code expires in
+          <strong id="countdown">10:00</strong>.
+        </p>
+        {% if config.PAYMENT_PROVIDER == 'sandbox' %}
+          <button id="simulate" class="btn btn-primary btn-block" type="button">
+            Simulate payment (sandbox)
+          </button>
+          <p class="fineprint">No real bank is contacted in sandbox mode.</p>
+        {% endif %}
+      {% elif order.status in ('paid', 'processing') %}
+        <h2>Payment received</h2>
+        <p>We are sending the top-up to the supplier now. This page updates itself.</p>
+      {% elif order.status == 'delivered' %}
+        <h2>Delivered</h2>
+        <p>{{ order.item_title }} was sent to <strong>{{ order.player_name }}</strong>.</p>
+      {% elif order.status == 'delivery_failed' %}
+        <h2>Delivery problem</h2>
+        <p>We could not reach the supplier. An operator has been alerted and will retry.</p>
+      {% elif order.status == 'expired' %}
+        <h2>This code expired</h2>
+        <p>No payment arrived in time. Nothing was charged — you can start a new order.</p>
+      {% elif order.status == 'cancelled' %}
+        <h2>Cancelled</h2>
+        <p>This order was cancelled before payment.</p>
+      {% elif order.status == 'refunded' %}
+        <h2>Refunded</h2>
+        <p>The money was returned through the bank.</p>
+      {% endif %}
+    </div>
+
+    <aside class="panel">
+      <h2>Details</h2>
+      <dl class="details">
+        <dt>Player ID</dt><dd>{{ order.player_id }}</dd>
+        {% if order.server %}<dt>Server</dt><dd>{{ order.server }}</dd>{% endif %}
+        <dt>Nickname</dt><dd>{{ order.player_name or '—' }}</dd>
+        <dt>Subtotal</dt><dd>{{ order.subtotal_cents|usd }}</dd>
+        <dt>Discount</dt><dd>{{ order.discount_cents|usd }}{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</dd>
+        <dt>Total</dt><dd><strong>{{ order.total_cents|usd }}</strong></dd>
+        <dt>Created</dt><dd>{{ order.created_at|localtime }}</dd>
+      </dl>
+
+      {% if history %}
+        <h3>History</h3>
+        <ul class="timeline">
+          {% for entry in history %}
+            <li>
+              <strong>{{ entry.new_status.replace('_', ' ')|title }}</strong>
+              <small>{{ entry.created_at|localtime }} · {{ entry.actor }}</small>
+              {% if entry.note %}<span>{{ entry.note }}</span>{% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/order.js') }}"></script>
+{% endblock %}

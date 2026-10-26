@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Ella Store — Instant game top-ups{% endblock %}
+
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="pill">Verified Player ID · Instant delivery</span>
+    <h1>Top up your game in <em>under two minutes</em>.</h1>
+    <p>Choose a game, confirm your player name, pay by KHQR. The diamonds arrive without
+       waiting for anyone to reply to a chat message.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#games">Browse games</a>
+      <a class="btn btn-ghost" href="{{ url_for('pages.lookup') }}">Track an order</a>
+    </div>
+  </div>
+  <ul class="hero-points">
+    <li><strong>No account</strong> Guest checkout, order number is your receipt.</li>
+    <li><strong>Real prices</strong> Calculated on the server, never in the browser.</li>
+    <li><strong>Safer</strong> Payment matched by amount, currency and reference.</li>
+  </ul>
+</section>
+
+<section id="games" class="section">
+  <div class="section-head">
+    <h2>All games</h2>
+    <input id="game-search" class="search" type="search" placeholder="Search a game…"
+           aria-label="Search games">
+  </div>
+
+  <div class="game-grid" id="game-grid">
+    {% for game in games %}
+      <a class="game-card" href="{{ url_for('pages.game', slug=game.slug) }}"
+         data-name="{{ game.name|lower }} {{ game.short_name|lower }}"
+         style="--card-gradient: {{ game.gradient }}; --card-accent: {{ game.accent }}">
+        <span class="game-logo">{{ game.logo_text }}</span>
+        <span class="game-body">
+          <strong>{{ game.short_name or game.name }}</strong>
+          <small>{{ game.name }}</small>
+          <span class="game-price">from {{ game.price_from|usd }}</span>
+        </span>
+        <button class="fav" type="button" data-slug="{{ game.slug }}"
+                aria-label="Save {{ game.short_name }} to favourites">☆</button>
+      </a>
+    {% endfor %}
+  </div>
+  <p class="empty" id="game-empty" hidden>No game matches that search.</p>
+</section>
+
+<section class="section features">
+  <article><h3>1 · Choose</h3><p>Pick the game and the pack you want.</p></article>
+  <article><h3>2 · Verify</h3><p>We show the in-game nickname before you pay.</p></article>
+  <article><h3>3 · Pay</h3><p>Scan the KHQR code with any banking app.</p></article>
+  <article><h3>4 · Receive</h3><p>The top-up is delivered and tracked automatically.</p></article>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock %}

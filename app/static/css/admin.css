@@ -1,0 +1,74 @@
+body.admin { background: #eef2f7; }
+
+.admin-bar {
+  display: flex; align-items: center; gap: 1.4rem; flex-wrap: wrap;
+  padding: .8rem clamp(1rem, 3vw, 2rem);
+  background: var(--navy); color: #e2e8f0;
+}
+.admin-bar .brand { color: #fff; }
+.admin-bar .brand-mark { background: #fff; color: var(--navy); }
+.admin-nav { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .92rem; }
+.admin-nav a { color: #cbd5e1; }
+.admin-nav a:hover { color: #fff; text-decoration: none; }
+.admin-user { margin-left: auto; display: flex; align-items: center; gap: .8rem; font-size: .85rem; color: #cbd5e1; }
+.admin-user a { color: #cbd5e1; }
+.admin-user form { margin: 0; }
+
+.admin-main { max-width: 1180px; margin: 0 auto; padding: 1.6rem clamp(1rem, 3vw, 2rem) 4rem; }
+.page-title { font-size: 1.5rem; margin-bottom: 1rem; }
+.page-head { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap; }
+.page-head .page-title { margin: 0; }
+.crumbs { font-size: .85rem; margin-bottom: .6rem; }
+
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.2rem; }
+.stat { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1.1rem; box-shadow: var(--shadow); }
+.stat span { display: block; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); }
+.stat strong { display: block; font-size: 1.5rem; margin: .2rem 0; color: var(--navy); }
+.stat small { color: var(--muted); }
+
+.panel { margin-bottom: 1.2rem; }
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; align-items: start; }
+
+.chart { display: flex; align-items: flex-end; gap: .35rem; height: 160px; padding-top: .5rem; }
+.chart .bar { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: .3rem; }
+.chart .bar span { display: block; width: 100%; min-height: 2px; border-radius: 4px 4px 0 0; background: linear-gradient(180deg, #60a5fa, #2563eb); }
+.chart .bar small { color: var(--muted); font-size: .68rem; }
+
+.table { width: 100%; border-collapse: collapse; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; font-size: .92rem; }
+.table.compact { font-size: .86rem; }
+.table th, .table td { padding: .6rem .8rem; text-align: left; border-bottom: 1px solid var(--line); vertical-align: top; }
+.table th { background: #f8fafc; font-size: .8rem; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); }
+.table tbody tr:last-child td { border-bottom: 0; }
+.table tbody tr:hover { background: #f9fbff; }
+
+.muted { color: var(--muted); }
+.list { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .6rem; font-size: .9rem; }
+.list li { display: grid; gap: .1rem; padding-bottom: .5rem; border-bottom: 1px dashed var(--line); }
+.list li:last-child { border-bottom: 0; }
+
+.filters { display: flex; gap: .8rem; align-items: flex-end; flex-wrap: wrap; }
+.filters .field { flex: 1 1 180px; }
+.filters label { margin-top: 0; }
+
+.actions { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+.actions form { margin: 0; }
+.refund { display: flex; gap: .5rem; align-items: center; flex: 1 1 320px; }
+.refund input { flex: 1; }
+
+.pager { display: flex; gap: .35rem; margin-top: 1rem; flex-wrap: wrap; }
+.pager a { padding: .3rem .65rem; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: .88rem; }
+.pager a.active { background: var(--navy); color: #fff; border-color: var(--navy); }
+
+.game-row header { display: flex; align-items: center; gap: 1rem; margin-bottom: .8rem; }
+.game-row header h2 { margin: 0; font-size: 1rem; }
+.game-row header p { margin: 0; font-size: .84rem; }
+.game-row header form { margin-left: auto; }
+
+.auth { display: grid; place-items: center; min-height: 68vh; }
+.auth-card { width: min(420px, 100%); }
+.auth-card h1 { font-size: 1.35rem; }
+
+@media (max-width: 860px) {
+  .two-col { grid-template-columns: 1fr; }
+  .admin-user { margin-left: 0; }
+}
