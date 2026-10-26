@@ -1,0 +1,20 @@
+{% extends "admin/base.html" %}
+{% block title %}Subscribers — Ella Store{% endblock %}
+
+{% block body %}
+<header class="page-head">
+  <h1 class="page-title">Subscribers</h1>
+  <a class="btn btn-ghost" href="{{ url_for('admin.subscribers_csv') }}">Export CSV</a>
+</header>
+
+<table class="table">
+  <thead><tr><th>Email</th><th>Joined</th></tr></thead>
+  <tbody>
+    {% for row in subscribers %}
+      <tr><td>{{ row.email }}</td><td class="muted">{{ row.created_at|localtime }}</td></tr>
+    {% else %}
+      <tr><td colspan="2" class="muted">No subscribers yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

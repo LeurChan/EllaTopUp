@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{{ game.short_name or game.name }} top-up — Ella Store{% endblock %}
+
+{% block content %}
+<section class="topup"
+         data-game="{{ game.slug }}"
+         data-server-type="{{ game.server_type }}">
+
+  <header class="topup-head" style="--card-gradient: {{ game.gradient }}; --card-accent: {{ game.accent }}">
+    <span class="game-logo lg">{{ game.logo_text }}</span>
+    <div>
+      <h1>{{ game.short_name or game.name }}</h1>
+      <p>{{ game.name }} · paid in {{ game.unit }}</p>
+    </div>
+  </header>
+
+  <div class="topup-grid">
+    <div class="panel">
+      <h2>1. Your account</h2>
+
+      <label for="player-id">Player ID</label>
+      <div class="inline">
+        <input id="player-id" name="player_id" inputmode="numeric" autocomplete="off"
+               placeholder="e.g. 123456789" required>
+        <button id="check-player" class="btn btn-ghost" type="button">Check ID</button>
+      </div>
+
+      {% if game.server_type == 'select' %}
+        <label for="server">Server</label>
+        <select id="server" name="server">
+          <option value="">Choose a server…</option>
+          {% for server in game.servers %}<option value="{{ server }}">{{ server }}</option>{% endfor %}
+        </select>
+      {% elif game.server_type == 'text' %}
+        <label for="server">Server</label>
+        <input id="server" name="server" placeholder="Server name or ID">
+      {% endif %}
+
+      <p id="player-status" class="hint" role="status"></p>
+
+      <h2>2. Choose a pack</h2>
+      <div class="product-grid" id="product-grid">
+        {% for product in products %}
+          <label class="product">
+            <input type="radio" name="product_id" value="{{ product.id }}"
+                   data-price="{{ product.price_cents }}" {% if loop.first %}checked{% endif %}>
+            <span class="product-body">
+              <strong>{{ product.title }}</strong>
+              <span class="product-price">{{ product.price_cents|usd }}</span>
+            </span>
+          </label>
+        {% endfor %}
+      </div>
+
+      <h2>3. Coupon</h2>
+      <div class="inline">
+        <input id="coupon" name="coupon" placeholder="Promo code (optional)" autocomplete="off">
+        <button id="apply-coupon" class="btn btn-ghost" type="button">Apply</button>
+      </div>
+      <p id="coupon-status" class="hint" role="status"></p>
+    </div>
+
+    <aside class="panel summary">
+      <h2>Summary</h2>
+      <dl>
+        <dt>Product</dt><dd id="sum-product">—</dd>
+        <dt>Player</dt><dd id="sum-player">—</dd>
+        <dt>Subtotal</dt><dd id="sum-subtotal">{{ 0|usd }}</dd>
+        <dt>Discount</dt><dd id="sum-discount">—</dd>
+        <dt class="total">Total</dt><dd class="total" id="sum-total">{{ 0|usd }}</dd>
+      </dl>
+      <button id="pay" class="btn btn-primary btn-block" type="button">Pay with KHQR</button>
+      <p id="pay-status" class="hint" role="status"></p>
+      <p class="fineprint">By paying you accept that the top-up is delivered to the Player ID
+        you entered. Check the nickname before you confirm.</p>
+    </aside>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script type="module" src="{{ url_for('static', filename='js/topup.js') }}"></script>
+{% endblock %}

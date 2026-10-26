@@ -1,0 +1,69 @@
+{% extends "admin/base.html" %}
+{% block title %}Orders — Ella Store{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Orders</h1>
+
+<form class="panel filters" method="get">
+  <div class="field">
+    <label for="q">Search</label>
+    <input id="q" name="q" value="{{ filters.q }}" placeholder="Order no, Player ID, nickname">
+  </div>
+  <div class="field">
+    <label for="status">Status</label>
+    <select id="status" name="status">
+      <option value="">Any</option>
+      {% for status in statuses %}
+        <option value="{{ status }}" {% if filters.status == status %}selected{% endif %}>
+          {{ status.replace('_', ' ')|title }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="field">
+    <label for="game">Game</label>
+    <select id="game" name="game">
+      <option value="">Any</option>
+      {% for game in games %}
+        <option value="{{ game.slug }}" {% if filters.game == game.slug %}selected{% endif %}>
+          {{ game.short_name or game.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+  <button class="btn btn-primary" type="submit">Filter</button>
+</form>
+
+<p class="muted">{{ total }} order(s)</p>
+
+<table class="table">
+  <thead>
+    <tr><th>Order</th><th>Game</th><th>Item</th><th>Player</th><th>Total</th>
+        <th>Status</th><th>Created</th></tr>
+  </thead>
+  <tbody>
+    {% for order in orders %}
+      <tr>
+        <td><a href="{{ url_for('admin.order_detail', order_no=order.order_no) }}">{{ order.order_no }}</a></td>
+        <td>{{ order.game_name }}</td>
+        <td>{{ order.item_title }}</td>
+        <td>{{ order.player_name or order.player_id }}<br><small class="muted">{{ order.player_id }}</small></td>
+        <td>{{ order.total_cents|usd }}</td>
+        <td><span class="status status-{{ order.status }}">{{ order.status.replace('_', ' ')|title }}</span></td>
+        <td class="muted">{{ order.created_at|localtime }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="7" class="muted">No orders match these filters.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+{% if pages > 1 %}
+  <nav class="pager">
+    {% for page in range(1, pages + 1) %}
+      <a class="{% if page == filters.page %}active{% endif %}"
+         href="{{ url_for('admin.order_list', status=filters.status, game=filters.game, q=filters.q, page=page) }}">{{ page }}</a>
+    {% endfor %}
+  </nav>
+{% endif %}
+{% endblock %}

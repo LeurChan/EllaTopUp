@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}{{ status }} — Ella Store{% endblock %}
+
+{% block content %}
+<section class="narrow center">
+  <h1>{{ status }}</h1>
+  <p>{{ message }}</p>
+  <a class="btn btn-primary" href="{{ url_for('pages.index') }}">Back to the store</a>
+</section>
+{% endblock %}

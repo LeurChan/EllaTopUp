@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+{% block title %}Coupons — Ella Store{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Coupons</h1>
+
+{% if current_user.role == 'administrator' %}
+  <form class="panel filters" method="post" action="{{ url_for('admin.coupon_create') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="code">Code</label>
+      <input id="code" name="code" placeholder="WELCOME10" required>
+    </div>
+    <div class="field">
+      <label for="percent">Discount %</label>
+      <input id="percent" name="percent" type="number" min="1" max="100" value="10" required>
+    </div>
+    <div class="field">
+      <label for="max_uses">Max uses (0 = unlimited)</label>
+      <input id="max_uses" name="max_uses" type="number" min="0" value="0">
+    </div>
+    <button class="btn btn-primary" type="submit">Save coupon</button>
+  </form>
+{% endif %}
+
+<table class="table">
+  <thead><tr><th>Code</th><th>Discount</th><th>Used</th><th>Limit</th><th>Expires</th><th>Active</th><th></th></tr></thead>
+  <tbody>
+    {% for coupon in coupons %}
+      <tr>
+        <td><strong>{{ coupon.code }}</strong></td>
+        <td>{{ coupon.discount_percent }}%</td>
+        <td>{{ coupon.used_count }}</td>
+        <td>{{ coupon.max_uses or '∞' }}</td>
+        <td>{{ coupon.expires_at|localtime or '—' }}</td>
+        <td>{{ 'yes' if coupon.active else 'no' }}</td>
+        <td>
+          {% if current_user.role == 'administrator' %}
+            <form method="post" action="{{ url_for('admin.coupon_toggle', code=coupon.code) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-ghost" type="submit">
+                {{ 'Disable' if coupon.active else 'Enable' }}
+              </button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
