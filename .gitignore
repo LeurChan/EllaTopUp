@@ -1,0 +1,32 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# Local environment
+.venv/
+.deps/
+.wheels/
+.scratch/
+scratch/
+instance/
+tests/.tmp/
+
+# Runtime data
+*.db
+*.db-wal
+*.db-shm
+*.sqlite3
+
+# Secrets
+.env
+instance/config.py
+
+# Editors / OS
+.vscode/
+.idea/
+Thumbs.db
+
+pytest-cache-files-*/
+__pycache__/
