@@ -1,0 +1,110 @@
+{% extends "admin/base.html" %}
+{% block title %}{{ order.order_no }} — Ella Store{% endblock %}
+
+{% block body %}
+<p class="crumbs"><a href="{{ url_for('admin.order_list') }}">← Orders</a></p>
+
+<header class="page-head">
+  <div>
+    <h1 class="page-title">{{ order.order_no }}</h1>
+    <p class="muted">{{ order.item_title }} · {{ order.game_name if order.game_name else '' }}</p>
+  </div>
+  <span class="status status-{{ order.status }}">{{ order.status.replace('_', ' ')|title }}</span>
+</header>
+
+<div class="two-col">
+  <section class="panel">
+    <h2>Customer input</h2>
+    <dl class="details">
+      <dt>Player ID</dt><dd>{{ order.player_id }}</dd>
+      {% if order.server %}<dt>Server</dt><dd>{{ order.server }}</dd>{% endif %}
+      <dt>Nickname</dt><dd>{{ order.player_name or '—' }}</dd>
+      <dt>Subtotal</dt><dd>{{ order.subtotal_cents|usd }}</dd>
+      <dt>Discount</dt><dd>{{ order.discount_cents|usd }}{% if order.coupon_code %} ({{ order.coupon_code }}){% endif %}</dd>
+      <dt>Total</dt><dd><strong>{{ order.total_cents|usd }}</strong></dd>
+      <dt>Created</dt><dd>{{ order.created_at|localtime }}</dd>
+      <dt>Expires</dt><dd>{{ order.expires_at|localtime }}</dd>
+    </dl>
+  </section>
+
+  <section class="panel">
+    <h2>Payment</h2>
+    {% if payment %}
+      <dl class="details">
+        <dt>Reference</dt><dd>{{ payment.qr_reference }}</dd>
+        <dt>Status</dt><dd>{{ payment.status|title }}</dd>
+        <dt>Amount</dt><dd>{{ payment.amount_cents|usd }} {{ payment.currency }}</dd>
+        <dt>Transaction</dt><dd>{{ payment.provider_txn_id or '—' }}</dd>
+        <dt>Confirmed</dt><dd>{{ payment.confirmed_at|localtime or '—' }}</dd>
+      </dl>
+    {% else %}
+      <p class="muted">No payment record.</p>
+    {% endif %}
+
+    <h3>Supplier attempts</h3>
+    {% if attempts %}
+      <ul class="list">
+        {% for attempt in attempts %}
+          <li>
+            <strong>#{{ attempt.attempt }} {{ attempt.result }}</strong>
+            <span class="muted">{{ attempt.message }}</span>
+            <small class="muted">{{ attempt.created_at|localtime }}</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No delivery attempt yet.</p>
+    {% endif %}
+  </section>
+</div>
+
+<section class="panel">
+  <h2>Actions</h2>
+  <div class="actions">
+    {% if order.status == 'delivery_failed' %}
+      <form method="post" action="{{ url_for('admin.order_retry', order_no=order.order_no) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-primary" type="submit">Retry delivery</button>
+      </form>
+    {% endif %}
+
+    {% if order.status in ('processing', 'delivery_failed') %}
+      <form method="post" action="{{ url_for('admin.order_deliver', order_no=order.order_no) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-ghost" type="submit">Mark delivered</button>
+      </form>
+    {% endif %}
+
+    {% if order.status == 'pending_payment' %}
+      <form method="post" action="{{ url_for('admin.order_cancel', order_no=order.order_no) }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button class="btn btn-ghost" type="submit">Cancel order</button>
+      </form>
+    {% endif %}
+
+    {% if current_user.role == 'administrator' and order.status in ('paid', 'processing', 'delivered', 'delivery_failed') %}
+      <form method="post" action="{{ url_for('admin.order_refund', order_no=order.order_no) }}" class="refund">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <input name="reason" placeholder="Refund reason (required)" required>
+        <button class="btn btn-danger" type="submit">Refund</button>
+      </form>
+    {% endif %}
+  </div>
+  {% if current_user.role != 'administrator' %}
+    <p class="fineprint">Operators cannot refund orders, edit prices or manage staff accounts.</p>
+  {% endif %}
+</section>
+
+<section class="panel">
+  <h2>History</h2>
+  <ul class="timeline">
+    {% for entry in history %}
+      <li>
+        <strong>{{ entry.new_status.replace('_', ' ')|title }}</strong>
+        <small>{{ entry.created_at|localtime }} · {{ entry.actor }}</small>
+        {% if entry.note %}<span>{{ entry.note }}</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

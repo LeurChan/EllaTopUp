@@ -1,0 +1,110 @@
+{% extends "admin/base.html" %}
+{% block title %}Dashboard — Ella Store{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Dashboard</h1>
+
+<div class="stat-grid">
+  <article class="stat">
+    <span>Revenue</span>
+    <strong>{{ d.revenue|usd }}</strong>
+    <small>paid, processing and delivered</small>
+  </article>
+  <article class="stat">
+    <span>Orders</span>
+    <strong>{{ d.orders }}</strong>
+    <small>average {{ d.average|usd }}</small>
+  </article>
+  <article class="stat">
+    <span>Awaiting payment</span>
+    <strong>{{ d.awaiting_value|usd }}</strong>
+    <small>{{ d.awaiting_count }} order(s) open</small>
+  </article>
+  <article class="stat">
+    <span>Today</span>
+    <strong>{{ d.orders_today }}</strong>
+    <small>delivered {{ d.failed }} failed</small>
+  </article>
+</div>
+
+<section class="panel">
+  <h2>Revenue, last 14 days</h2>
+  {% set peak = (d.series|map(attribute='revenue')|max) or 1 %}
+  <div class="chart">
+    {% for point in d.series %}
+      <div class="bar" title="{{ point.date }} · {{ point.revenue|usd }}">
+        <span style="height: {{ (point.revenue / peak * 100)|round(1) }}%"></span>
+        <small>{{ point.date[8:] }}</small>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<div class="two-col">
+  <section class="panel">
+    <h2>Top games</h2>
+    <table class="table">
+      <thead><tr><th>Game</th><th>Orders</th><th>Revenue</th></tr></thead>
+      <tbody>
+        {% for row in d.top_games %}
+          <tr><td>{{ row.name }}</td><td>{{ row.orders }}</td><td>{{ row.revenue|usd }}</td></tr>
+        {% else %}
+          <tr><td colspan="3" class="muted">No sales yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="panel">
+    <h2>Needs attention</h2>
+    {% if d.failed_orders %}
+      <h3>Delivery failed</h3>
+      <ul class="list">
+        {% for order in d.failed_orders %}
+          <li>
+            <a href="{{ url_for('admin.order_detail', order_no=order.order_no) }}">{{ order.order_no }}</a>
+            <span class="muted">{{ order.item_title }} · {{ order.player_id }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="muted">No failed deliveries.</p>
+    {% endif %}
+
+    {% if d.awaiting_orders %}
+      <h3>Awaiting payment</h3>
+      <ul class="list">
+        {% for order in d.awaiting_orders %}
+          <li>
+            <a href="{{ url_for('admin.order_detail', order_no=order.order_no) }}">{{ order.order_no }}</a>
+            <span class="muted">{{ order.total_cents|usd }} · expires {{ order.expires_at|localtime }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </section>
+</div>
+
+<section class="panel">
+  <h2>Recent orders</h2>
+  <table class="table">
+    <thead>
+      <tr><th>Order</th><th>Item</th><th>Player</th><th>Total</th><th>Status</th><th>Created</th></tr>
+    </thead>
+    <tbody>
+      {% for order in d.recent %}
+        <tr>
+          <td><a href="{{ url_for('admin.order_detail', order_no=order.order_no) }}">{{ order.order_no }}</a></td>
+          <td>{{ order.item_title }}</td>
+          <td>{{ order.player_name or order.player_id }}</td>
+          <td>{{ order.total_cents|usd }}</td>
+          <td><span class="status status-{{ order.status }}">{{ order.status.replace('_', ' ')|title }}</span></td>
+          <td class="muted">{{ order.created_at|localtime }}</td>
+        </tr>
+      {% else %}
+        <tr><td colspan="6" class="muted">No orders yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

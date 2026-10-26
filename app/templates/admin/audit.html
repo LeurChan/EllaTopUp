@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% block title %}Audit log — Ella Store{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Audit log</h1>
+<p class="muted">Every status change, refund and catalog change is recorded here.</p>
+
+<table class="table">
+  <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Entity</th><th>Old</th><th>New</th></tr></thead>
+  <tbody>
+    {% for entry in entries %}
+      <tr>
+        <td class="muted">{{ entry.created_at|localtime }}</td>
+        <td>{{ entry.actor }}</td>
+        <td>{{ entry.action }}</td>
+        <td>{{ entry.entity }}{% if entry.entity_id %} #{{ entry.entity_id }}{% endif %}</td>
+        <td class="muted">{{ entry.old_value }}</td>
+        <td>{{ entry.new_value }}</td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6" class="muted">Nothing recorded yet.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

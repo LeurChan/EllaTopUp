@@ -1,0 +1,21 @@
+{% extends "admin/base.html" %}
+{% block title %}Staff sign in — Ella Store{% endblock %}
+
+{% block body %}
+<section class="auth">
+  <form method="post" class="panel auth-card">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <h1>Staff sign in</h1>
+    <p class="hint">Operators and administrators only.</p>
+
+    <label for="username">Username</label>
+    <input id="username" name="username" autocomplete="username" required autofocus>
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" autocomplete="current-password" required>
+
+    <button class="btn btn-primary btn-block" type="submit">Sign in</button>
+    <p class="fineprint"><a href="{{ url_for('pages.index') }}">← Back to the store</a></p>
+  </form>
+</section>
+{% endblock %}

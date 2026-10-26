@@ -1,0 +1,50 @@
+{% extends "admin/base.html" %}
+{% block title %}Staff — Ella Store{% endblock %}
+
+{% block body %}
+<h1 class="page-title">Staff accounts</h1>
+
+<form class="panel filters" method="post" action="{{ url_for('admin.user_create') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label for="username">Username</label>
+    <input id="username" name="username" required>
+  </div>
+  <div class="field">
+    <label for="password">Temporary password</label>
+    <input id="password" name="password" type="password" minlength="8" required>
+  </div>
+  <div class="field">
+    <label for="role">Role</label>
+    <select id="role" name="role">
+      <option value="operator">Operator</option>
+      <option value="administrator">Administrator</option>
+    </select>
+  </div>
+  <button class="btn btn-primary" type="submit">Create account</button>
+</form>
+
+<table class="table">
+  <thead><tr><th>Username</th><th>Role</th><th>Active</th><th>Created</th><th></th></tr></thead>
+  <tbody>
+    {% for user in users %}
+      <tr>
+        <td>{{ user.username }}</td>
+        <td>{{ user.role }}</td>
+        <td>{{ 'yes' if user.active else 'no' }}</td>
+        <td class="muted">{{ user.created_at|localtime }}</td>
+        <td>
+          {% if user.id != current_user.id %}
+            <form method="post" action="{{ url_for('admin.user_toggle', user_id=user.id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button class="btn btn-sm btn-ghost" type="submit">
+                {{ 'Disable' if user.active else 'Enable' }}
+              </button>
+            </form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
